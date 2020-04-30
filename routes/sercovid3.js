@@ -12,6 +12,56 @@ router.get('/', (req, res, next) => {
   res.render('index', { title: 'SERCOVID-2' });
 })
 
+router.get('/:apikey/user_connect', (req, res, next) => {
+    var apikey = req.params.apikey
+
+    Individu.findByOneField('cle_api', apikey, (futindividu) => {
+        if (futindividu.length === 1) {
+            Individu.replaceByOneField(futindividu[0].codeIndividu, 'est_actif', 1, (msg) => {
+                console.log(msg)
+
+                var result = {
+                    status: 1
+                }
+
+                res.json(result)
+            })
+        } else {
+            var result = {
+                status: 0,
+                error: "Clé api incorrecte."
+            }
+
+            res.json(result)
+        }
+    })
+})
+
+router.get('/:apikey/user_deconnect', (req, res, next) => {
+    var apikey = req.params.apikey
+
+    Individu.findByOneField('cle_api', apikey, (futindividu) => {
+        if (futindividu.length === 1) {
+            Individu.replaceByOneField(futindividu[0].codeIndividu, 'est_actif', 0, (msg) => {
+                console.log(msg)
+
+                var result = {
+                    status: 1
+                }
+
+                res.json(result)
+            })
+        } else {
+            var result = {
+                status: 0,
+                error: "Clé api incorrecte."
+            }
+
+            res.json(result)
+        }
+    })
+})
+
 router.get('/:apikey/check_notifications', (req, res, next) => {
     var apikey = req.params.apikey
 
