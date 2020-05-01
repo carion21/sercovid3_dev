@@ -4,12 +4,86 @@ var router = express.Router();
 const Individu = require('../models/Individu')
 const NotificationClient = require('../models/NotificationClient')
 const ProcheIndividu = require('../models/ProcheIndividu')
+const StatLocal = require('../models/StatLocal')
+const StatNonLocal = require('../models/StatNonLocal')
 
 const TransformDate = require('../config/transform_date')
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
   res.render('index', { title: 'SERCOVID-2' });
+})
+
+router.get('/:apikey/get_stat_local', (req, res, next) => {
+    var apikey = req.params.apikey
+
+    Individu.findByOneField('cle_api', apikey, (futindividu) => {
+        if (futindividu.length === 1) {
+            let laststatlocal;
+            StatLocal.findLast((futlastlocal) => {
+                if (futlastlocal.length === 1) {
+                    console.log(laststatlocal)   
+                    var result = {
+                        status: 1,
+                        pack: futlastlocal
+                    }
+
+                    res.json(result)
+                } else {
+                    var result = {
+                        status: 0,
+                        error: "Pas de données"
+                    }
+
+                    res.json(result)
+                }
+            }) 
+            
+        } else {
+            var result = {
+                status: 0,
+                error: "Clé api incorrecte."
+            }
+
+            res.json(result)
+        }
+    })
+})
+
+router.get('/:apikey/get_stat_nonlocal', (req, res, next) => {
+    var apikey = req.params.apikey
+
+    Individu.findByOneField('cle_api', apikey, (futindividu) => {
+        if (futindividu.length === 1) {
+            let laststatnonlocal;
+            StatNonLocal.findLast((futlastnonlocal) => {
+                if (futlastnonlocal.length === 1) {
+                    console.log(laststatnonlocal)   
+                    var result = {
+                        status: 1,
+                        pack: futlastnonlocal
+                    }
+
+                    res.json(result)
+                } else {
+                    var result = {
+                        status: 0,
+                        error: "Pas de données"
+                    }
+
+                    res.json(result)
+                }
+            }) 
+            
+        } else {
+            var result = {
+                status: 0,
+                error: "Clé api incorrecte."
+            }
+
+            res.json(result)
+        }
+    })
 })
 
 router.get('/:apikey/user_connect', (req, res, next) => {
@@ -61,6 +135,31 @@ router.get('/:apikey/user_deconnect', (req, res, next) => {
         }
     })
 })
+
+router.get('/:apikey/check_status', (req, res, next) =>  {
+    var apikey = req.params.apikey
+
+    Individu.findByOneField('cle_api', apikey, (futindividu) => {
+        if (futindividu.length === 1) {
+
+            var result = {
+                status: 1,
+                pack: futindividu[0].status
+            }
+            
+            res.json(result)
+        } else {
+            var result = {
+                status: 0,
+                error: "Clé api incorrecte."
+            }
+
+            res.json(result)
+        }
+    })
+})
+
+
 
 router.get('/:apikey/check_notifications', (req, res, next) => {
     var apikey = req.params.apikey
